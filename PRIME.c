@@ -1,41 +1,55 @@
-#include<stdio.h>
-#include<conio.h>
-inta,b,u,v,n,i,j,ne=1;
-int visited[10]={0},min,mincost,cost[10][10];
-void main()
-{
-clrscr();
-printf("\nEnter the number of nodes:");
-scanf("%d",&n);
-printf("\nEnter the adjaceny matrix:\n");
-for(i=1;i<=n;i++)
-for(j=1;j<=n;j++)
-{
-scanf("%d",&cost[i][j]);
-if(cost[i][j]==0)
-cost[i][j]=999;
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+#define MAX_POINTS 1000
+// Function to calculate Manhattan distance
+int manhattanDistance(int x1, int y1, int x2, int y2) {
+ return abs(x1 - x2) + abs(y1 - y2);
 }
-visited[1]=1;
-printf("\n");
-while(ne<n)
-{
-for(i=1,min=999;i<=n;i++)
-for(j=1;j<=n;j++)
-if(cost[i][j]<min)
-if(visited[i]!=0)
-{
-min=cost[i][j]; a=u=i;
-b=v=j;
+// Function to find the minimum cost to connect all points using Prim's algorithm
+int minCostConnectPoints(int points[][2], int pointsSize) {
+ int minCost = 0;
+ int visited[MAX_POINTS] = {0};
+ int minDist[MAX_POINTS];
+ for (int i = 0; i < pointsSize; i++) {
+ minDist[i] = INT_MAX;
+ }
+ minDist[0] = 0; // Start with the first point
+ for (int i = 0; i < pointsSize; i++) {
+ int u = -1;
+ // Find the point with the smallest distance that is not visited
+ for (int j = 0; j < pointsSize; j++) {
+ if (!visited[j] && (u == -1 || minDist[j] < minDist[u])) {
+ u = j;
+ }
+ }
+ visited[u] = 1;
+ minCost += minDist[u];
+ // Update the distances of the remaining points
+ for (int v = 0; v < pointsSize; v++) {
+ if (!visited[v]) {
+ int dist = manhattanDistance(
+ points[u][0], points[u][1],
+ points[v][0], points[v][1]
+ );
+ if (dist < minDist[v]) {
+ minDist[v] = dist;
+ }
+ }
+ }
+ }
+ return minCost;
 }
- 
-if(visited[u]==0||visited[v]==0)
-{
-printf("\nEdge%d:(%d%d)cost:%d",ne++,a,b,min);
-mincost+=min;
-visited[b]=1;
-}
-cost[a][b]=cost[b][a]=999;
-}
-printf("\nMinimum cost=%d",mincost);
-getch();
+int main() {
+ int points[][2] = {
+ {0, 0},
+ {2, 2},
+ {3, 10},
+ {5, 2},
+ {7, 0}
+ };
+ int pointsSize = sizeof(points) / sizeof(points[0]);
+ int result = minCostConnectPoints(points, pointsSize);
+ printf("Minimum cost to connect all points: %d\n", result);
+ return 0;
 }
